@@ -1,4 +1,6 @@
-const server = Bun.serve<{ authToken: string }>({
+const connections = new Set();
+
+const server = Bun.serve({
   fetch(req, server) {
     const success = server.upgrade(req);
     if (success) {
@@ -18,10 +20,12 @@ const server = Bun.serve<{ authToken: string }>({
       ws.send(`You said: ${message}`);
     },
     open(ws) {
+      connections.add(ws);
       console.log('connection opened')
       ws.send("Welcome to my websocket server.")
     },
     close(ws){
+      connections.delete(ws);
       console.log('connection closed')
     }
   },

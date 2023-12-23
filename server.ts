@@ -5,11 +5,17 @@ Bun.serve({
 
     const url = new URL(req.url);
     const filePath = BASE_PATH + url.pathname;
-    if (filePath.endsWith("/") || filePath.endsWith("/index.html"))
-       return new Response(Bun.file(BASE_PATH+"/index.html"));
-    const file = Bun.file(filePath);
-    if(file){
-    return new Response(file);
+    if (filePath.endsWith("/") || filePath.endsWith("/index.html")) {
+      return new Response(Bun.file(BASE_PATH + "/index.html"));
+    }
+    try {
+      const file = Bun.file(filePath);
+      if (file) {
+        return new Response(file);
+      }
+    } catch(error){
+      console.error("Error serving file at", filePath, error)
+      return new Response("Internal Server Error", { status: 500 })
     }
     return new Response("Nothing here")
   },
